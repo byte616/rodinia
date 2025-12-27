@@ -238,7 +238,7 @@ void runTest(int argc, char **argv) {
 #endif
     }
 
-    cudaThreadSynchronize();
+    cudaDeviceSynchronize();
 
     if (getenv("OUTPUT")){
         // Printing output
