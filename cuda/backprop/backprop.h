@@ -37,7 +37,7 @@ typedef struct {
 
 
 /*** User-level functions ***/
-
+/*
 void bpnn_initialize();
 
 BPNN *bpnn_create();
@@ -48,6 +48,26 @@ void bpnn_feedforward();
 
 void bpnn_save();
 BPNN *bpnn_read();
+*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+BPNN *bpnn_create(int n_in, int n_hidden, int n_out);
+void bpnn_save(BPNN *net, char *filename);
+void bpnn_free(BPNN *net);
+void bpnn_initialize(int seed);
+
+void run(int argc, char **argv);
+void bpnn_train_cuda(BPNN*, float*, float*);
+
+void bpnn_layerforward(float*, float*, float**, int, int);
+void bpnn_output_error(float*, float*, float*, int, float*);
+void bpnn_hidden_error(float*, int, float*, int, float**, float*, float*);
+void bpnn_adjust_weights(float*, int, float*, int, float**, float**);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
