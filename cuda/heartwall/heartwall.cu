@@ -8,7 +8,7 @@
 //	LIBRARIES
 //======================================================================================================================================================
 
-#include <helper_cuda.h>
+// #include <helper_cuda.h>
 
 #include <stdlib.h>
 #include <math.h>
@@ -44,6 +44,18 @@ params_unique *d_unique;
 
 //	WRITE DATA FUNCTION
 //===============================================================================================================================================================================================================200
+
+// checkCudaErrors
+#define checkCudaErrors(call) do { \
+    cudaError_t err = call; \
+    if (err != cudaSuccess) { \
+        fprintf(stderr, \
+                "CUDA error %s:%d: %s\n", \
+                __FILE__, __LINE__, cudaGetErrorString(err)); \
+        exit(EXIT_FAILURE); \
+    } \
+} while (0)
+
 
 void write_data(const char *filename, int frameNo, int frames_processed,
                 int endoPoints, int *input_a, int *input_b, int epiPoints,

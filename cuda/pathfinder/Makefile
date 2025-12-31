@@ -1,10 +1,41 @@
-include ../common.mk
+# ===== Target =====
+EXE := pathfinder
 
-EXE  = pathfinder
+# ===== Compiler =====
+CXX := clang++
+CC  := clang
 
-.PHONY: all
-all: $(EXE)
+# ===== CUDA =====
+CUDA_PATH ?= /usr/local/cuda-12
+CUDA_ARCH := sm_89
+
+# ===== Flags =====
+CXXFLAGS := -O2 
+CFLAGS   := -O2 
+CUDAFLAGS := \
+	--cuda-gpu-arch=$(CUDA_ARCH) \
+	--cuda-path=$(CUDA_PATH) \
+
+INCLUDES := -I$(CUDA_PATH)/include
+LDFLAGS := \
+	-L$(CUDA_PATH)/lib64 \
+	-lcudart -ldl -lrt -pthread \
+
+# ===== Source =====
+SRCS := \
+	pathfinder.cu
+
+# ===== Object =====
+OBJS := $(SRCS:.cu=.o)
+
+# ===== Rules =====
+$(EXE): $(OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+# ---- CUDA compile ----
+%.o: %.cu
+	$(CXX) $(CXXFLAGS) $(CUDAFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(EXE) output.txt
+	rm -f $(EXE) $(OBJS) output.txt

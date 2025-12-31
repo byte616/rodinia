@@ -58,7 +58,7 @@ void kernel_gpu_cuda_wrapper(par_str par_cpu, dim_str dim_cpu, box_str *box_cpu,
     //	INITIAL DRIVER OVERHEAD
     //====================================================================================================100
 
-    cudaThreadSynchronize();
+    cudaDeviceSynchronize();
 
     //====================================================================================================100
     //	VARIABLES
@@ -168,7 +168,7 @@ void kernel_gpu_cuda_wrapper(par_str par_cpu, dim_str dim_cpu, box_str *box_cpu,
                                          d_qv_gpu, d_fv_gpu);
 
     checkCUDAError("Start");
-    cudaThreadSynchronize();
+    cudaDeviceSynchronize();
 
     time4 = get_time();
 

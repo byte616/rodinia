@@ -1,10 +1,46 @@
-include ../common.mk
+# ===== Target =====
+EXES := particlefilter_naive particlefilter_double
 
-EXES  = particlefilter_naive particlefilter_double
+# ===== Compiler =====
+CXX := clang++
+CC  := clang
 
-.PHONY: all
+# ===== CUDA =====
+CUDA_PATH ?= /usr/local/cuda-12
+CUDA_ARCH := sm_89
+
+# ===== Flags =====
+CXXFLAGS := -O2 
+CFLAGS   := -O2 
+CUDAFLAGS := \
+	--cuda-gpu-arch=$(CUDA_ARCH) \
+	--cuda-path=$(CUDA_PATH) \
+
+INCLUDES := -I$(CUDA_PATH)/include
+LDFLAGS := \
+	-L$(CUDA_PATH)/lib64 \
+	-lcudart -ldl -lrt -pthread \
+
+# ===== Source =====
+SRCS := \
+	particlefilter_naive.cu \
+	particlefilter_double.cu 
+
+OBJS := $(SRCS:.cu=.o)
+
+# ===== Rules =====
 all: $(EXES)
+
+particlefilter_naive: particlefilter_naive.o
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+particlefilter_double: particlefilter_double.o
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+# ---- CUDA compile ----
+%.o: %.cu
+	$(CXX) $(CXXFLAGS) $(CUDAFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(EXES) output.txt
+	rm -f $(EXE) $(OBJS) output.txt

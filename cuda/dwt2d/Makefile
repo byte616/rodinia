@@ -1,13 +1,48 @@
-include ../common.mk
+# ===== Target =====
+EXE := dwt2d
 
-EXE  = dwt2d
-OBJS = dwt.o components.o dwt_cuda/common.o dwt_cuda/fdwt53.o dwt_cuda/fdwt97.o dwt_cuda/rdwt53.o dwt_cuda/rdwt97.o
+# ===== Compiler =====
+CXX := clang++
+CC  := clang
 
-.PHONY: all
-all: $(EXE)
+# ===== CUDA =====
+CUDA_PATH ?= /usr/local/cuda-12
+CUDA_ARCH := sm_89
 
+# ===== Flags =====
+CXXFLAGS := -O2 
+CFLAGS   := -O2 
+CUDAFLAGS := \
+	--cuda-gpu-arch=$(CUDA_ARCH) \
+	--cuda-path=$(CUDA_PATH) \
+
+INCLUDES := -I$(CUDA_PATH)/include
+LDFLAGS := \
+	-L$(CUDA_PATH)/lib64 \
+	-lcudart -ldl -lrt -pthread \
+
+# ===== Source =====
+SRCS := \
+	dwt2d.cu \
+	dwt.cu \
+	components.cu \
+	dwt_cuda/common.cu \
+	dwt_cuda/fdwt53.cu \
+	dwt_cuda/fdwt97.cu \
+	dwt_cuda/rdwt53.cu \
+	dwt_cuda/rdwt97.cu
+
+# ===== Object =====
+OBJS := $(SRCS:.cu=.o)
+
+# ===== Rules =====
 $(EXE): $(OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+# ---- CUDA compile ----
+%.o: %.cu
+	$(CXX) $(CXXFLAGS) $(CUDAFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(EXE) $(OBJS)
+	rm -f $(EXE) $(OBJS)

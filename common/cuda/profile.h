@@ -4,7 +4,7 @@
 #include <cuda_profiler_api.h>
 #include <cuda_runtime.h>
 
-#include "nvToolsExt.h"
+#include <nvtx3/nvToolsExt.h>
 
 extern bool enabled;
 extern bool started;
