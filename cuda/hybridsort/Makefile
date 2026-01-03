@@ -1,21 +1,43 @@
-include ../common.mk
+# ===== Target =====
+EXE := hybridsort
 
-EXE  = hybridsort
-OBJS = bucketsort.o mergesort.o
+# ===== Compiler =====
+CXX := clang++
+CC  := clang
 
-.PHONY: all
-all: $(EXE)
+# ===== CUDA =====
+CUDA_PATH ?= /usr/local/cuda-12
+CUDA_ARCH := sm_89
 
-ifdef VERIFY
-CPPFLAGS += VERIFY = -DVERIFY
-endif
+# ===== Flags =====
+CXXFLAGS := -O2 
+CFLAGS   := -O2 
+CUDAFLAGS := \
+	--cuda-gpu-arch=$(CUDA_ARCH) \
+	--cuda-path=$(CUDA_PATH) \
 
-ifdef TIMER
-CPPFLAGS += TIMER = -DTIMER
-endif
+INCLUDES := -I$(CUDA_PATH)/include
+LDFLAGS := \
+	-L$(CUDA_PATH)/lib64 \
+	-lcudart -ldl -lrt -pthread \
 
+# ===== Source =====
+SRCS := \
+	hybridsort.cu \
+	bucketsort.cu \
+	mergesort.cu
+
+# ===== Object =====
+OBJS := $(SRCS:.cu=.o)
+
+# ===== Rules =====
 $(EXE): $(OBJS)
+	$(CXX) $^ $(LDFLAGS) -o $@
+
+# ---- CUDA compile ----
+%.o: %.cu
+	$(CXX) $(CXXFLAGS) $(CUDAFLAGS) $(INCLUDES) -c $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(EXE) $(OBJS)
+	rm -f $(EXE) $(OBJS)
